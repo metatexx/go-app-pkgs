@@ -1,4 +1,6 @@
 # Binaries for programs and plugins
+examples/mountpoint/mountpoint
+examples/mountpoint/web
 *.exe
 *.exe~
 *.dll
