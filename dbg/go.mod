@@ -1,4 +1,4 @@
-module github.com/metatexx/go-app-pkgs/mountpoint
+module github.com/metatexx/go-app-pkgs/dbg
 
 go 1.17
 
