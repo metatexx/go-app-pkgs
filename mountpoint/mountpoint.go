@@ -46,11 +46,13 @@ func (c *mp1) Render() app.UI {
 	return c.ui
 }
 
-//
 type UI struct {
 	ui replacer
 }
 
+// Switch lets you switch the app.UI component with another one.
+// It guarantees that the former component gets dismounted and
+// the new one gets mounted in place of the old one.
 func (c *UI) Switch(el app.UI) {
 	switch c.ui.nr() {
 	case 0:
@@ -60,10 +62,12 @@ func (c *UI) Switch(el app.UI) {
 	}
 }
 
+// UI returns the reference to the current mounted app.UI
 func (m *UI) UI() app.UI {
 	return m.ui
 }
 
+// New creates a new mountpoint for switching app.UI components
 func New(ui app.UI) *UI {
 	return &UI{&mp0{ui: ui}}
 }
