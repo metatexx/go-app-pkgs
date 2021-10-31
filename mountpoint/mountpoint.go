@@ -54,6 +54,12 @@ type UI struct {
 // It guarantees that the former component gets dismounted and
 // the new one gets mounted in place of the old one.
 func (c *UI) Switch(el app.UI) {
+	if c.ui == el {
+		return
+	}
+	if el.Mounted() {
+		return
+	}
 	switch c.ui.nr() {
 	case 0:
 		c.ui = &mp1{ui: el, n: 1}
