@@ -6,10 +6,12 @@ import (
 	"strings"
 )
 
-const active = true
+// anables or disables logging
+var Enabled = true
 
+// Log logs the string(s) together with the caller information
 func Log(msg ...string) {
-	if !active {
+	if !Enabled {
 		return
 	}
 	fpcs := make([]uintptr, 1)
@@ -32,8 +34,9 @@ func Log(msg ...string) {
 	app.Log(txt)
 }
 
+// Logf is like Log() but with a sprintf style format string
 func Logf(fmt string, msg ...interface{}) {
-	if !active {
+	if !Enabled {
 		return
 	}
 	fpcs := make([]uintptr, 1)
@@ -54,4 +57,12 @@ func Logf(fmt string, msg ...interface{}) {
 	args = append(args, txt)
 	args = append(args, msg...)
 	app.Logf("%s: "+fmt, args...)
+}
+
+// Logc uses console.log() and makes it easy to debug jsValue in the browser
+func Logc(msg interface{}) {
+	if !Enabled {
+		return
+	}
+	app.Window().Get("console").Call("log", msg)
 }
