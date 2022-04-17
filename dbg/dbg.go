@@ -6,8 +6,12 @@ import (
 	"strings"
 )
 
-// anables or disables logging
+// Enabled is used to anable or disable all logging
 var Enabled = true
+
+// TrimPrefixes defines the prefixes to strip from the output
+// so it is less verbose
+var TrimPrefixes = []string{""}
 
 // Log logs the string(s) together with the caller information
 func Log(msg ...string) {
@@ -27,7 +31,10 @@ func Log(msg ...string) {
 		app.Log("MSG CALLER WAS NIL")
 	}
 	// Print the name of the function (but trim to our package names)
-	txt := strings.TrimPrefix(strings.TrimPrefix(caller.Name(), "github.com/metatexx/gobro/"), "cmd/app/")
+	txt := caller.Name()
+	for _, prefix := range TrimPrefixes {
+		txt = strings.TrimPrefix(txt, prefix)
+	}
 	if len(msg) > 0 {
 		txt += ": " + strings.Join(msg, ", ")
 	}
