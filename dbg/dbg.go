@@ -14,7 +14,7 @@ var Enabled = true
 var TrimPrefixes = []string{""}
 
 // Log logs the string(s) together with the caller information
-func Log(msg ...string) {
+func Log(msg ...interface{}) {
 	if !Enabled {
 		return
 	}
@@ -36,9 +36,14 @@ func Log(msg ...string) {
 		txt = strings.TrimPrefix(txt, prefix)
 	}
 	if len(msg) > 0 {
-		txt += ": " + strings.Join(msg, ", ")
+		txt += ":"
+		var args []interface{}
+		args = append(args, txt)
+		args = append(args, msg...)
+		app.Log(args...)
+	} else {
+		app.Log(txt)
 	}
-	app.Log(txt)
 }
 
 // Logf is like Log() but with a sprintf style format string
@@ -59,7 +64,10 @@ func Logf(fmt string, msg ...interface{}) {
 		app.Log("MSG CALLER WAS NIL")
 	}
 	// Print the name of the function (but trim to our package names)
-	txt := strings.TrimPrefix(strings.TrimPrefix(caller.Name(), "github.com/metatexx/gobro/"), "cmd/app/")
+	txt := caller.Name()
+	for _, prefix := range TrimPrefixes {
+		txt = strings.TrimPrefix(txt, prefix)
+	}
 	var args []interface{}
 	args = append(args, txt)
 	args = append(args, msg...)
