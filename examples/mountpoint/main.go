@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
-	"github.com/metatexx/go-app-pkgs/mountpoint"
 	"log"
 	"net/http"
 	"strconv"
+
+	"github.com/metatexx/go-app-pkgs/mountpoint"
 
 	"github.com/maxence-charriere/go-app/v9/pkg/app"
 )
@@ -25,13 +26,20 @@ type isolate struct {
 	app.Compo
 	Tabs1  []app.UI
 	Tabs2  []app.UI
+	Tabs3  []func() app.UI
 	Active int
 	mp     *mountpoint.UI
+	maxTab app.UI
 }
 
 func (c *isolate) OnInit() {
 	c.Tabs1 = []app.UI{&tab{Text: "Content A"}, &tab{Text: "Content B"}, &tab{Text: "Content C"}}
 	c.Tabs2 = []app.UI{&tab{Text: "Content A"}, &tab{Text: "Content B"}, &tab{Text: "Content C"}}
+	c.Tabs3 = []func() app.UI{
+		func() app.UI { return &tab{Text: "Content A"} },
+		func() app.UI { return &tab{Text: "Content B"} },
+		func() app.UI { return &tab{Text: "Content C"} },
+	}
 	c.mp = mountpoint.New(c.Tabs1[0])
 }
 
@@ -43,6 +51,16 @@ func (c *isolate) OnNav(ctx app.Context) {
 	}
 	c.Active = idx
 	c.mp.Switch(c.Tabs1[c.Active])
+
+	c.maxSwitch(ctx)
+}
+
+func (c *isolate) maxSwitch(ctx app.Context) {
+	idx, _ := strconv.Atoi(ctx.Page().URL().Fragment)
+	if idx >= 3 {
+		idx = 0
+	}
+	c.maxTab = c.Tabs3[idx]()
 }
 
 func (c *isolate) Render() app.UI {
@@ -60,12 +78,14 @@ func (c *isolate) Render() app.UI {
 			app.Div().Style("padding", "5px").Body(c.Tabs2[c.Active]),
 			app.Div().Style("margin-top", "10px").Text("Using mountpoint"),
 			app.Div().Style("padding", "5px").Body(c.mp.UI()),
+			app.Div().Style("margin-top", "10px").Text("Using Max's implementation"),
+			app.Div().Style("padding", "5px").Body(c.maxTab),
 		),
 	)
 }
 
 func main() {
-	app.Route("/", &isolate{})
+	app.Route("/", app.NewZeroComponentFactory(&isolate{}))
 	app.RunWhenOnBrowser()
 	http.Handle("/", &app.Handler{
 		Name:        "Isolate",
